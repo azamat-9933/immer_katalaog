@@ -137,23 +137,6 @@ def get_subcategories_by_category_name(category_name, language):
     return [subcategory[0] for subcategory in cursor.fetchall()]
 
 
-def get_all_products_models(category_name, language):
-    conn = psycopg2.connect(
-        database=DB_NAME,
-        port=DB_PORT,
-        host=DB_HOST,
-        user=DB_USER,
-        password=DB_PASSWORD
-    )
-    cursor = conn.cursor()
-
-    cursor.execute(f"""
-    SELECT model
-    FROM bot_product
-    WHERE category_id = (SELECT id FROM bot_category WHERE name_{language} = %s);
-    """, (category_name,))
-
-    return [product[0] for product in cursor.fetchall()]
 
 
 def get_product_info(product_model_name, language):
@@ -175,7 +158,7 @@ def get_product_info(product_model_name, language):
     return cursor.fetchone()
 
 
-def get_product_all_photos(product_model):
+def get_product_all_photos(product_id):
     conn = psycopg2.connect(
         database=DB_NAME,
         port=DB_PORT,
@@ -188,26 +171,15 @@ def get_product_all_photos(product_model):
     cursor.execute(f"""
     SELECT image
     FROM bot_productimage
-    WHERE product_id = (SELECT id FROM bot_product WHERE model = %s);
-    """, (product_model,))
+    WHERE product_id = %s;
+    """, (product_id,))
 
-    return ["media/"+photo[0] for photo in cursor.fetchall()]
-
-
-def return_product_all_info_with_photo(product_model_name, language):
-    product_info = get_product_info(product_model_name, language)
-    photos = get_product_all_photos(product_model_name)
-
-    return {
-        'name': product_info[0],
-        'description': product_info[1],
-        'model': product_info[2],
-        'price': product_info[3],
-        'photos': photos
-    }
+    return ["media/" + photo[0] for photo in cursor.fetchall()]
 
 
-def get_all_sale_products():
+
+
+def get_all_sale_products(language):
     conn = psycopg2.connect(
         database=DB_NAME,
         port=DB_PORT,
@@ -218,10 +190,60 @@ def get_all_sale_products():
     cursor = conn.cursor()
 
     cursor.execute(f"""
-    SELECT model
-    FROM bot_product
-    WHERE action = True;
-    """)
-    data = cursor.fetchall()
+        SELECT id, name_{language}, model, description_{language}, price
+        FROM bot_product
+        WHERE action = True;
+        """)
+    product_data = cursor.fetchall()
+    data = []
 
-    return [product[0] for product in data]
+    for product in product_data:
+        product_id, name, model, description, price = product
+        photos = get_product_all_photos(product_id)
+        data.append({
+            'id': product_id,
+            'name': name,
+            'model': model,
+            'description': description,
+            'price': price,
+            'photos': photos
+        })
+
+    return data
+
+
+def get_all_products(language, category_name):
+    conn = psycopg2.connect(
+        database=DB_NAME,
+        port=DB_PORT,
+        host=DB_HOST,
+        user=DB_USER,
+        password=DB_PASSWORD
+    )
+    cursor = conn.cursor()
+
+    cursor.execute(f"""
+    SELECT id, name_{language}, model, description_{language}, price
+    FROM bot_product
+    WHERE category_id = (SELECT id FROM bot_category WHERE name_{language} = %s);
+    """, (category_name,))
+
+    product_data = cursor.fetchall()
+    data = []
+
+    for product in product_data:
+        product_id, name, model, description, price = product
+        photos = get_product_all_photos(product_id)
+        data.append({
+            'id': product_id,
+            'name': name,
+            'model': model,
+            'description': description,
+            'price': price,
+            'photos': photos
+        })
+
+    return data
+
+
+get_all_products(language="uz", category_name="Dazmol")

@@ -29,8 +29,8 @@ Tilni tanlang: 🌐</b>""",
         "uz": """<b>Ketegoriya tanlandi: </b>"""
     },
     "message_8": {
-        "ru": """<b>Выберите модель: ⬇</b>""",
-        "uz": """<b>Modelni tanlang: ⬇</b>"""
+        "ru": """<b>На данный момент по этой категории нету товаров ❌</b>""",
+        "uz": """<b>Hozirda uchbu kategoriyaga tegishli tovarlar mavjud emas ❌</b>"""
     },
     "message_9": {
         "ru": """<b>Вы выбрали раздел скидок ⬇</b>""",
@@ -81,10 +81,12 @@ def generate_media_group_of_product_photos(photos, text):
     media = MediaGroup()
 
     for photo in photos:
-        print(photo)
         if photos.index(photo) == 0:
             media.attach_photo(InputFile(photo), caption=text)
         else:
             media.attach_photo(InputFile(photo))
 
     return media
+
+
+

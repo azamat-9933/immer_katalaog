@@ -9,3 +9,4 @@ class KatalogStatesGroup(StatesGroup):
     main_category = State()
     subcategory = State()
     product = State()
+    show_products_by_main_category = State()

@@ -15,8 +15,8 @@ class BotUser(models.Model):
 
 
 class Category(MPTTModel):
-    name_uz = models.CharField(max_length=255)
-    name_ru = models.CharField(max_length=255)
+    name_uz = models.CharField(max_length=255, unique=True)
+    name_ru = models.CharField(max_length=255, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     parent = TreeForeignKey('self', on_delete=models.CASCADE,
                             related_name='children', blank=True, null=True)

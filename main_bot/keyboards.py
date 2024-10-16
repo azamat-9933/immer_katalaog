@@ -47,9 +47,9 @@ def generate_settings_buttons(language):
 def generate_categories_buttons(categories: list, language):
     markup = ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     if language == 'ru':
-        sale_button = KeyboardButton(text="Скидки 🈹")
+        sale_button = KeyboardButton(text="Скидки 💥")
     else:
-        sale_button = KeyboardButton(text="Chegirmalar 🈹")
+        sale_button = KeyboardButton(text="Chegirmalar 💥")
 
     markup.add(sale_button)
     for category in categories:
